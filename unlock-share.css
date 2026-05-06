@@ -1,0 +1,473 @@
+/* ============================================================
+   GAMHUB ESTATE — WHATSAPP "UNLOCK BY SHARING" MODAL
+   unlock-share.css
+
+   Equivalent of unlock-share.css from GamHub Jobs.
+   Adapted for the property marketplace:
+     - Terracotta (#bc643c) replaces gold (#d4a853) as accent
+     - Copy references properties / listings not CVs / downloads
+     - All variable names prefixed ghe- not ghj-
+     - WhatsApp green retained — brand colour is universal
+
+   Consumed by: unlock-share-feature.js → showUnlockModal()
+   ============================================================ */
+
+/* ============================================================
+   OVERLAY WRAPPER
+   ============================================================ */
+#ghe-unlock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+#ghe-unlock-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ============================================================
+   BLURRED BACKDROP
+   ============================================================ */
+.ghe-unlock-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 10, 8, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
+/* ============================================================
+   MODAL CARD
+   ============================================================ */
+.ghe-unlock-modal {
+  position: relative;
+  z-index: 1;
+
+  /* Warm dark surface — matches estate palette */
+  background: linear-gradient(160deg, #100d08 0%, #0e130b 60%, #100d08 100%);
+  border: 1px solid rgba(188, 100, 60, 0.28);
+  border-radius: 24px;
+  padding: 40px 36px 32px;
+  max-width: 460px;
+  width: 100%;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  text-align: center;
+
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(188, 100, 60, 0.08),
+    0 0 80px rgba(188, 100, 60, 0.06);
+
+  transform: translateY(24px) scale(0.96);
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity   0.35s ease;
+}
+.ghe-unlock-modal::-webkit-scrollbar { display: none; }
+
+#ghe-unlock-overlay.visible .ghe-unlock-modal {
+  transform: translateY(0) scale(1);
+}
+
+/* Unlocked state — gold border celebrates the achievement */
+.ghe-unlock-modal.unlocked {
+  border-color: rgba(201, 169, 110, 0.4);
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(201, 169, 110, 0.12),
+    0 0 80px rgba(201, 169, 110, 0.08);
+}
+
+/* ============================================================
+   CLOSE BUTTON
+   ============================================================ */
+.ghe-unlock-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 32px; height: 32px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.ghe-unlock-close:hover {
+  background: rgba(188, 100, 60, 0.18);
+  border-color: rgba(188, 100, 60, 0.4);
+  color: #d4845a;
+}
+
+/* ============================================================
+   ICON
+   House icon with terracotta gradient backing
+   ============================================================ */
+.ghe-unlock-icon-wrap {
+  position: relative;
+  width: 72px; height: 72px;
+  margin: 0 auto 20px;
+}
+.ghe-unlock-icon {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, #bc643c, #d4845a);
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  position: relative; z-index: 1;
+  box-shadow: 0 0 0 0 rgba(188, 100, 60, 0.4);
+  animation: gheUnlockIconPulse 2.6s ease-in-out infinite;
+}
+.ghe-unlock-icon-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 26px;
+  border: 1px solid rgba(188, 100, 60, 0.22);
+  animation: gheUnlockRingExpand 2.6s ease-in-out infinite;
+}
+@keyframes gheUnlockIconPulse {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(188, 100, 60, 0.4); }
+  50%       { box-shadow: 0 0 0 14px rgba(188, 100, 60, 0);   }
+}
+@keyframes gheUnlockRingExpand {
+  0%, 100% { transform: scale(1);    opacity: 0.5; }
+  50%       { transform: scale(1.15); opacity: 0;   }
+}
+
+/* ============================================================
+   TITLE & SUBTITLE
+   ============================================================ */
+.ghe-unlock-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 4vw, 22px);
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 10px;
+  line-height: 1.3;
+}
+.ghe-unlock-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+/* ============================================================
+   BENEFIT PILL
+   ============================================================ */
+.ghe-unlock-benefit {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: rgba(188, 100, 60, 0.1);
+  border: 1px solid rgba(188, 100, 60, 0.3);
+  border-radius: 14px;
+  padding: 10px 20px;
+  margin-bottom: 24px;
+}
+.ghe-unlock-benefit-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #d4845a;
+  letter-spacing: 0.03em;
+}
+.ghe-unlock-benefit-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ============================================================
+   PROGRESS SECTION
+   ============================================================ */
+.ghe-unlock-progress-wrap {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+.ghe-unlock-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.ghe-unlock-progress-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+.ghe-unlock-progress-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #bc643c;
+  transition: color 0.3s;
+}
+
+/* Progress bar track */
+.ghe-unlock-track {
+  position: relative;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 100px;
+  overflow: visible;
+  margin-bottom: 14px;
+}
+
+/* Fill bar */
+.ghe-unlock-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #bc643c, #d4845a);
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+/* Moving dot at the end of the fill */
+.ghe-unlock-fill::after {
+  content: '';
+  position: absolute;
+  right: -1px; top: 50%;
+  transform: translateY(-50%);
+  width: 14px; height: 14px;
+  background: #d4845a;
+  border-radius: 50%;
+  border: 2px solid #100d08;
+  box-shadow: 0 0 8px rgba(188, 100, 60, 0.6);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.ghe-unlock-fill:not([style*="width: 0"]):not([style*="width:0"])::after {
+  opacity: 1;
+}
+
+/* Completed fill — shifts to gold shimmer */
+.ghe-unlock-fill.complete {
+  background: linear-gradient(90deg, #c9a96e, #e2c98a);
+  animation: gheUnlockFillShimmer 1.6s ease-in-out infinite;
+}
+@keyframes gheUnlockFillShimmer {
+  0%, 100% { filter: brightness(1);    }
+  50%       { filter: brightness(1.22); }
+}
+
+/* Pip markers at each step along the track */
+.ghe-unlock-pip {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.4s ease;
+  z-index: 2;
+}
+.ghe-unlock-pip.done {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: transparent;
+  box-shadow: 0 0 6px rgba(188, 100, 60, 0.45);
+}
+
+/* Step number badges below the track */
+.ghe-unlock-steps {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 4px;
+}
+.ghe-unlock-step {
+  flex: 1;
+  height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.28);
+  transition: all 0.3s ease;
+}
+.ghe-unlock-step.done {
+  background: rgba(188, 100, 60, 0.15);
+  border-color: rgba(188, 100, 60, 0.35);
+  color: #d4845a;
+  animation: gheUnlockStepPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes gheUnlockStepPop {
+  0%   { transform: scale(0.8); }
+  100% { transform: scale(1);   }
+}
+
+/* ============================================================
+   SHARE BUTTON
+   WhatsApp green — intentionally not terracotta
+   ============================================================ */
+.ghe-unlock-share-btn {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 16px 20px 16px 52px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 28px rgba(37, 211, 102, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 12px;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.ghe-unlock-share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(37, 211, 102, 0.5);
+}
+.ghe-unlock-share-btn:active {
+  transform: translateY(0);
+}
+
+/* WhatsApp logo inside button */
+.ghe-unlock-share-btn svg {
+  width: 22px; height: 22px;
+  fill: #fff;
+  position: absolute;
+  left: 18px;
+  flex-shrink: 0;
+}
+
+/* "X more shares" hint on the right of the button */
+.ghe-unlock-share-hint {
+  position: absolute;
+  right: 14px;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   FOOTER NOTE
+   ============================================================ */
+.ghe-unlock-note {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.22);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   UNLOCK COMPLETE STATE
+   Replaces the share button after goal is reached
+   ============================================================ */
+.ghe-unlock-complete {
+  text-align: center;
+  padding: 6px 0 4px;
+  animation: gheUnlockFadeUp 0.4s ease;
+}
+@keyframes gheUnlockFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ghe-unlock-complete-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: gheUnlockCompleteIcon 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes gheUnlockCompleteIcon {
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+
+.ghe-unlock-complete h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.ghe-unlock-complete p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+/* Proceed button — terracotta, not WhatsApp green */
+.ghe-unlock-proceed-btn {
+  width: 100%;
+  padding: 15px 24px;
+  background: linear-gradient(135deg, #bc643c, #d4845a);
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 28px rgba(188, 100, 60, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.ghe-unlock-proceed-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(188, 100, 60, 0.5);
+}
+
+/* ============================================================
+   MOBILE ADJUSTMENTS
+   ============================================================ */
+@media (max-width: 480px) {
+  .ghe-unlock-modal {
+    padding: 32px 20px 24px;
+    border-radius: 20px;
+  }
+  .ghe-unlock-title            { font-size: 18px; }
+  .ghe-unlock-share-btn        { font-size: 14px; padding-left: 44px; }
+  .ghe-unlock-share-btn svg    { width: 18px; height: 18px; left: 14px; }
+  .ghe-unlock-share-hint       { display: none; }
+  .ghe-unlock-progress-wrap    { padding: 14px 14px; }
+  .ghe-unlock-benefit          { padding: 9px 14px; }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .ghe-unlock-icon,
+  .ghe-unlock-icon-ring,
+  .ghe-unlock-fill.complete   { animation: none !important; }
+  .ghe-unlock-fill            { transition: width 0.3s ease !important; }
+  .ghe-unlock-modal           { transition: opacity 0.2s ease !important; transform: none !important; }
+  #ghe-unlock-overlay.visible .ghe-unlock-modal { transform: none; }
+}
