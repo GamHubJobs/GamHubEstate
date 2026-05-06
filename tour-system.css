@@ -1,0 +1,389 @@
+/* ============================================================
+   GAMHUB ESTATE — TOUR / HINT SYSTEM
+   tour-system.css
+
+   Equivalent of tour-system.css from GamHub Jobs.
+   Scroll-triggered contextual hints guide first-time visitors
+   through the property marketplace.
+
+   Colour palette inherits from styles.css tokens:
+     --terracotta  #bc643c   primary accent (was --gold in Jobs)
+     --terra2      #d4845a   secondary accent
+     --gold        #c9a96e   highlight
+   ============================================================ */
+
+/* ============================================================
+   DIM OVERLAY
+   Shared element — re-used by GHETour
+   ============================================================ */
+#tour-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 9100;
+
+  /*
+    CRITICAL: pointer-events MUST remain 'none' at all times.
+    The overlay is purely visual — it must never intercept taps
+    or clicks. Individual popovers carry pointer-events:all so
+    their own dismiss buttons still work correctly on mobile.
+  */
+  pointer-events: none !important;
+
+  transition: background 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+}
+#tour-overlay.active {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.46);
+  /* pointer-events stays NONE — intentional */
+}
+
+/* ============================================================
+   HIGHLIGHT RING
+   Pulses around the targeted element to draw attention
+   ============================================================ */
+.ghe-tour-ring {
+  position: fixed;
+  border-radius: 10px;
+  z-index: 9150;
+  pointer-events: none; /* never intercepts taps */
+  box-shadow:
+    0 0 0 2.5px #bc643c,
+    0 0 0 5px   rgba(188, 100, 60, 0.22);
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    top     0.1s ease,
+    left    0.1s ease,
+    width   0.1s ease,
+    height  0.1s ease;
+}
+.ghe-tour-ring.visible {
+  opacity: 1;
+  animation: gheTourRingPulse 2.5s ease-in-out infinite;
+}
+.ghe-tour-ring.dismissing {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  animation: none;
+}
+
+@keyframes gheTourRingPulse {
+  0%,  100% {
+    box-shadow:
+      0 0 0 2.5px #bc643c,
+      0 0 0 5px   rgba(188, 100, 60, 0.22);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2.5px #d4845a,
+      0 0 0 12px  rgba(188, 100, 60, 0.06);
+  }
+}
+
+/* ============================================================
+   POPOVER CARD
+   White card shown alongside the highlighted element
+   ============================================================ */
+.ghe-tour-popover {
+  position: fixed;
+  z-index: 9200;
+  max-width: 230px;
+  min-width: 160px;
+
+  /* Off-white card — warmer than GamHub Jobs pure-white */
+  background: #faf7f2;
+  color: #1a1510;
+  border-radius: 14px;
+  padding: 14px 16px 13px;
+
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.16),
+    0 2px 8px  rgba(0, 0, 0, 0.10),
+    0 0 0 1px  rgba(188, 100, 60, 0.08);
+
+  font-family: 'Outfit', sans-serif;
+
+  /*
+    Popovers ARE interactive so the dismiss button (✕) can
+    be tapped on mobile without the overlay blocking it.
+  */
+  pointer-events: all;
+
+  transition:
+    opacity   0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+    top       0.1s  ease,
+    left      0.1s  ease;
+
+  opacity: 0;
+  transform: scale(0.88) translateY(10px);
+  isolation: isolate;
+}
+.ghe-tour-popover.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+.ghe-tour-popover.scroll-hint {
+  transform: scale(0.94) translateY(14px);
+}
+.ghe-tour-popover.scroll-hint.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Top accent stripe — terracotta brand colour */
+.ghe-tour-popover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 14px; right: 14px;
+  height: 2px;
+  background: linear-gradient(90deg, #bc643c, #d4845a);
+  border-radius: 0 0 2px 2px;
+  opacity: 0.7;
+}
+
+/* ============================================================
+   DISMISS BUTTON  ✕
+   Minimum 44 × 44 pt tap target via padding trick (iOS HIG)
+   ============================================================ */
+.ghe-tour-dismiss {
+  position: absolute;
+  top: 8px; right: 8px;
+  /* Visual size */
+  width: 20px; height: 20px;
+  /* Invisible tap area expansion */
+  padding: 12px;
+  margin: -12px;
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 11px;
+  color: #888;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.ghe-tour-dismiss:hover {
+  background: rgba(188, 100, 60, 0.12);
+  color: #bc643c;
+}
+
+/* ============================================================
+   BODY TEXT
+   ============================================================ */
+.ghe-tour-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #2a1f18;
+  margin-right: 18px;
+  font-weight: 500;
+}
+.ghe-tour-text em {
+  font-style: normal;
+  color: #bc643c;
+  font-weight: 700;
+}
+
+/* ============================================================
+   STEP PROGRESS PILL
+   Shows e.g. "1 of 3" with coloured dots
+   ============================================================ */
+.ghe-tour-step-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(188, 100, 60, 0.08);
+  border-radius: 100px;
+  padding: 3px 9px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #b07050;
+  margin-top: 10px;
+  letter-spacing: 0.04em;
+  font-family: 'JetBrains Mono', monospace;
+}
+.ghe-tour-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(188, 100, 60, 0.25);
+  transition: background 0.2s;
+}
+.ghe-tour-dot.active { background: #bc643c; }
+
+/* ============================================================
+   DIRECTIONAL ARROW SVG
+   Points from the popover toward the highlighted element
+   ============================================================ */
+.ghe-tour-arrow {
+  position: absolute;
+  width: 26px; height: 26px;
+  overflow: visible;
+  pointer-events: none;
+  display: none;
+}
+.ghe-tour-popover[data-arrow]        .ghe-tour-arrow { display: block; }
+.ghe-tour-popover[data-arrow="right"] .ghe-tour-arrow {
+  right: -13px; top: 50%;
+  transform: translateY(-50%);
+}
+.ghe-tour-popover[data-arrow="left"]  .ghe-tour-arrow {
+  left: -13px; top: 50%;
+  transform: translateY(-50%) scaleX(-1);
+}
+.ghe-tour-popover[data-arrow="bottom"] .ghe-tour-arrow {
+  bottom: -13px; left: 50%;
+  transform: translateX(-50%) rotate(90deg);
+}
+.ghe-tour-popover[data-arrow="top"]   .ghe-tour-arrow {
+  top: -13px; left: 50%;
+  transform: translateX(-50%) rotate(-90deg);
+}
+
+/* Arrow SVG path inherits terracotta tint */
+.ghe-tour-arrow path,
+.ghe-tour-arrow line {
+  stroke: #bc643c;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   PROPERTY-SPECIFIC HIGHLIGHT VARIANTS
+
+   Used when a ring wraps a price badge, photo thumbnail,
+   or map pin — shapes that aren't rectangular
+   ============================================================ */
+
+/* Circular ring — for avatar / logo targets */
+.ghe-tour-ring.ring-circle {
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2.5px #bc643c,
+    0 0 0 5px   rgba(188, 100, 60, 0.22);
+}
+
+/* Pill ring — for badge / chip targets */
+.ghe-tour-ring.ring-pill {
+  border-radius: 100px;
+}
+
+/* Soft ring — subtler pulse for large card targets */
+.ghe-tour-ring.ring-soft {
+  box-shadow:
+    0 0 0 1.5px rgba(188, 100, 60, 0.5),
+    0 0 0 6px   rgba(188, 100, 60, 0.1);
+}
+.ghe-tour-ring.ring-soft.visible {
+  animation: gheTourRingSoftPulse 2.8s ease-in-out infinite;
+}
+@keyframes gheTourRingSoftPulse {
+  0%,  100% { box-shadow: 0 0 0 1.5px rgba(188, 100, 60, 0.5), 0 0 0 6px  rgba(188, 100, 60, 0.1); }
+  50%        { box-shadow: 0 0 0 1.5px rgba(212, 132, 90, 0.4), 0 0 0 14px rgba(188, 100, 60, 0.04); }
+}
+
+/* ============================================================
+   "NEW" BADGE VARIANT
+   Appears inside the popover for newly added features
+   ============================================================ */
+.ghe-tour-new-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #bc643c, #d4845a);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 2px 7px;
+  margin-right: 6px;
+  vertical-align: middle;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ============================================================
+   POPOVER THEME VARIANT — Dark mode
+   Used for hints that appear over the landing hero
+   (light popover would be hard to see against the dark bg)
+   ============================================================ */
+.ghe-tour-popover.theme-dark {
+  background: #1f1c14;
+  color: #ede8df;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 2px 8px  rgba(0, 0, 0, 0.25),
+    0 0 0 1px  var(--border, rgba(201, 169, 110, 0.16));
+}
+.ghe-tour-popover.theme-dark::before {
+  opacity: 1;
+}
+.ghe-tour-popover.theme-dark .ghe-tour-text {
+  color: #e8e2d6;
+}
+.ghe-tour-popover.theme-dark .ghe-tour-dismiss {
+  background: rgba(255, 255, 255, 0.07);
+  color: #9a8a78;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.ghe-tour-popover.theme-dark .ghe-tour-dismiss:hover {
+  background: rgba(188, 100, 60, 0.18);
+  color: #d4845a;
+  border-color: rgba(188, 100, 60, 0.35);
+}
+.ghe-tour-popover.theme-dark .ghe-tour-step-pill {
+  background: rgba(188, 100, 60, 0.14);
+  color: #c07858;
+}
+.ghe-tour-popover.theme-dark .ghe-tour-dot {
+  background: rgba(188, 100, 60, 0.3);
+}
+.ghe-tour-popover.theme-dark .ghe-tour-dot.active {
+  background: #d4845a;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   Respects OS-level accessibility preference
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .ghe-tour-ring                { animation: none !important; }
+  .ghe-tour-popover             { transition: opacity 0.2s ease !important; transform: none !important; }
+  .ghe-tour-popover.scroll-hint { transform: none !important; }
+}
+
+/* ============================================================
+   MOBILE ADJUSTMENTS
+   ============================================================ */
+@media (max-width: 480px) {
+  .ghe-tour-popover {
+    max-width: 190px;
+    padding: 12px 14px 11px;
+  }
+  .ghe-tour-text { font-size: 12px; }
+  .ghe-tour-step-pill { font-size: 9px; }
+}
+
+/* ============================================================
+   HIGH CONTRAST MODE
+   Ensures hints remain visible when forced colours are active
+   ============================================================ */
+@media (forced-colors: active) {
+  .ghe-tour-ring {
+    box-shadow: 0 0 0 3px ButtonText;
+    forced-color-adjust: none;
+  }
+  .ghe-tour-popover {
+    border: 2px solid ButtonText;
+    forced-color-adjust: none;
+  }
+  .ghe-tour-dismiss {
+    border: 1px solid ButtonText;
+    forced-color-adjust: none;
+  }
+}
