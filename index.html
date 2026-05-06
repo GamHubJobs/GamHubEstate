@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GamHub Estate — Gambia's #1 Property Marketplace</title>
+<meta name="description" content="GamHub Estate — Buy, sell and rent properties across The Gambia. Verified listings in Banjul, Fajara, Kololi, Bakau and beyond. Free to browse, free to list.">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Supabase JS v2 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+<link rel="icon" type="image/png" href="favicon.png">
+
+<!-- Main styles -->
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="unlock-share.css">
+<link rel="stylesheet" href="seeker-board.css">
+<link rel="stylesheet" href="tour-system.css">
+
+<!-- Vercel Analytics -->
+<script>
+  window.va = window.va || function () {
+    (window.vaq = window.vaq || []).push(arguments);
+  };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+</head>
+<body>
+
+<!-- ============================================================
+     TOAST CONTAINER
+     ============================================================ -->
+<div id="toast-container"></div>
+
+<!-- ============================================================
+     TOUR OVERLAY
+     ============================================================ -->
+<div id="tour-overlay" onclick="GHETour && GHETour.dismissAll()"></div>
+
+<!-- ============================================================
+     STICKY NAVBAR
+     ============================================================ -->
+<nav id="navbar">
+  <div class="nav-logo" onclick="showView('landing')" style="cursor:pointer">
+    <div class="nav-logo-icon">⬡</div>
+    GamHub Estate
+  </div>
+  <div class="nav-links">
+    <a href="#" onclick="showView('search')">Browse Properties</a>
+    <a href="#" onclick="scrollToSection('how')">How It Works</a>
+    <a href="#" onclick="showView('seeker-board')" style="color:var(--terracotta)">🔍 Property Seekers</a>
+    <a href="#" onclick="showView('agent-portal')" style="color:var(--gold)">For Agents</a>
+  </div>
+  <div class="nav-actions">
+    <div class="nav-user-pill" id="nav-user-pill">
+      <div class="nav-user-avatar" id="nav-user-avatar">U</div>
+      <span class="nav-user-email" id="nav-user-email"></span>
+      <button class="btn btn-ghost btn-sm" onclick="authSignOut()">Log out</button>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="nav-login-btn" onclick="showAuthModal()" style="display:none">Log in</button>
+    <button class="btn btn-outline btn-sm" onclick="showView('agent-portal')">List Property</button>
+    <button class="btn btn-terracotta btn-sm" onclick="showView('search')">Browse →</button>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Open menu">
+    <span></span><span></span><span></span>
+    <span class="hamburger-label">Menu</span>
+  </button>
+</nav>
+
+<!-- Mobile drawer -->
+<div id="mobile-drawer">
+  <div class="drawer-auth-row" id="drawer-auth-row" style="display:none">
+    <div class="drawer-auth-email" id="drawer-auth-email"></div>
+    <button class="btn btn-ghost btn-sm" onclick="authSignOut();closeMobileNav()" style="font-size:12px;color:#f87171;">Log out</button>
+  </div>
+  <a href="#" onclick="showView('search');closeMobileNav()">🏠 Browse Properties</a>
+  <a href="#" onclick="scrollToSection('how');closeMobileNav()">ℹ How It Works</a>
+  <a href="#" onclick="showView('seeker-board');closeMobileNav()">🔍 Property Seekers</a>
+  <a href="#" onclick="showView('agent-portal');closeMobileNav()">🏢 List a Property</a>
+  <a href="#" onclick="showView('privacy');closeMobileNav()">Privacy</a>
+  <a href="#" onclick="showView('terms');closeMobileNav()">Terms</a>
+  <div class="drawer-actions">
+    <button class="btn btn-terracotta btn-full" onclick="showView('search');closeMobileNav()">
+      ⬡ Browse Properties
+    </button>
+    <button class="btn btn-outline btn-full" onclick="showView('agent-portal');closeMobileNav()">
+      🏢 List My Property
+    </button>
+    <button class="btn btn-ghost btn-full" id="drawer-login-btn"
+      onclick="showAuthModal();closeMobileNav()">
+      Log in
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     VIEW 1 — LANDING PAGE
+     ============================================================ -->
+<div id="view-landing" class="view active">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-map-bg" aria-hidden="true"></div>
+    <div class="hero-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Gambia's #1 Property Marketplace</div>
+      <h1 class="hero-title">
+        <span class="line"><span class="word">Find Your</span></span>
+        <span class="line"><span class="word"><em>Perfect Home</em></span></span>
+        <span class="line"><span class="word">in The Gambia</span></span>
+      </h1>
+      <p class="hero-sub">Verified property listings across Banjul, Fajara, Kololi, Bakau and beyond. Buy, sell, or rent — all in one place. Free to browse, free to list.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-terracotta btn-lg" onclick="showView('search')">Browse Properties →</button>
+        <button class="btn btn-outline btn-lg" onclick="showView('agent-portal')">List Your Property</button>
+      </div>
+
+      <!-- Quick search bar -->
+      <div class="hero-search-bar" id="hero-search-bar">
+        <select class="hero-search-select" id="hero-type" onchange="heroSearch()">
+          <option value="">Buy or Rent?</option>
+          <option value="For Sale">For Sale</option>
+          <option value="For Rent">For Rent</option>
+          <option value="Commercial">Commercial</option>
+          <option value="Land">Land</option>
+        </select>
+        <select class="hero-search-select" id="hero-location" onchange="heroSearch()">
+          <option value="">Any Location</option>
+          <option>Banjul</option>
+          <option>Fajara</option>
+          <option>Kololi</option>
+          <option>Bakau</option>
+          <option>Serrekunda</option>
+          <option>Kairaba Avenue</option>
+          <option>Brufut</option>
+          <option>Bijilo</option>
+          <option>Brikama</option>
+          <option>Lamin</option>
+          <option>Kerr Serign</option>
+        </select>
+        <select class="hero-search-select" id="hero-beds" onchange="heroSearch()">
+          <option value="">Any Bedrooms</option>
+          <option value="1">1+ Beds</option>
+          <option value="2">2+ Beds</option>
+          <option value="3">3+ Beds</option>
+          <option value="4">4+ Beds</option>
+          <option value="5">5+ Beds</option>
+        </select>
+        <button class="btn btn-terracotta" onclick="heroSearch()">Search</button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">50+</span>
+          <span class="stat-label">Active Listings</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">12+</span>
+          <span class="stat-label">Locations covered</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">GMD 0</span>
+          <span class="stat-label">To list your property</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">24hrs</span>
+          <span class="stat-label">Avg. listing review</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Property Types -->
+  <section class="section-types" id="types">
+    <div class="section-header">
+      <div class="section-label">Browse by Type</div>
+      <h2>What are you<br>looking for?</h2>
+    </div>
+    <div class="types-grid">
+      <div class="type-card" onclick="quickFilterType('For Sale')">
+        <div class="type-card-icon">🏡</div>
+        <div class="type-card-label">For Sale</div>
+        <div class="type-card-sub">Houses, villas &amp; apartments</div>
+        <div class="type-card-arrow">→</div>
+      </div>
+      <div class="type-card featured" onclick="quickFilterType('For Rent')">
+        <div class="type-card-icon">🔑</div>
+        <div class="type-card-label">For Rent</div>
+        <div class="type-card-sub">Monthly &amp; long-term lets</div>
+        <div class="type-card-arrow">→</div>
+      </div>
+      <div class="type-card" onclick="quickFilterType('Commercial')">
+        <div class="type-card-icon">🏢</div>
+        <div class="type-card-label">Commercial</div>
+        <div class="type-card-sub">Offices, shops &amp; warehouses</div>
+        <div class="type-card-arrow">→</div>
+      </div>
+      <div class="type-card" onclick="quickFilterType('Land')">
+        <div class="type-card-icon">📐</div>
+        <div class="type-card-label">Land</div>
+        <div class="type-card-sub">Plots &amp; development land</div>
+        <div class="type-card-arrow">→</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bento Features -->
+  <section class="section-bento" id="features">
+    <div class="section-header">
+      <div class="section-label">Platform Features</div>
+      <h2>Built for buyers,<br>sellers &amp; agents in The Gambia</h2>
+    </div>
+    <div class="bento-grid">
+      <div class="bento-card col-7 featured">
+        <div class="bento-icon">🔍</div>
+        <h3>Verified Property Search</h3>
+        <p>Browse verified listings across every region in The Gambia. Filter by type, location, price range, bedrooms, and amenities. Every listing is reviewed before going live.</p>
+      </div>
+      <div class="bento-card col-5">
+        <div class="bento-icon">🏢</div>
+        <h3>Agent Portal</h3>
+        <p>Agents and private sellers post listings free. Free basic listing, reviewed within 24 hours and live for thousands of Gambians to see.</p>
+        <div style="margin-top:16px">
+          <button class="btn btn-terracotta btn-sm" onclick="showView('agent-portal')">List a Property Free →</button>
+        </div>
+      </div>
+      <div class="bento-card col-4">
+        <div class="bento-icon">📍</div>
+        <h3>Location-Based Discovery</h3>
+        <p>Find properties by specific neighbourhood — from Kairaba Avenue to Brufut Gardens.</p>
+      </div>
+      <div class="bento-card col-4">
+        <div class="bento-icon">🌟</div>
+        <h3>Property Seekers Board</h3>
+        <p>Buyers and renters post what they're looking for. Agents find ready buyers instantly.</p>
+      </div>
+      <div class="bento-card col-4">
+        <div class="bento-icon">💬</div>
+        <h3>Direct Contact</h3>
+        <p>Connect with agents and sellers directly via email or WhatsApp — no middleman.</p>
+      </div>
+      <div class="bento-card col-12">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;">
+          <div>
+            <div class="bento-icon" style="margin-bottom:12px">📲</div>
+            <h3>WhatsApp Job Alerts</h3>
+            <p style="max-width:500px">Get instant alerts when new properties matching your criteria are listed. Join our WhatsApp channel — free forever.</p>
+          </div>
+          <a href="https://whatsapp.com/channel/XXXXXXXXX" target="_blank" rel="noopener noreferrer"
+             class="btn btn-whatsapp btn-lg">
+            💬 Join WhatsApp Channel
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section-how" id="how">
+    <div class="section-header">
+      <div class="section-label">Process</div>
+      <h2>From browsing<br>to keys in hand</h2>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num">01 — DISCOVER</div>
+        <h3>Browse Listings</h3>
+        <p>Search verified properties by type, location, price, and size.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">02 — EXPLORE</div>
+        <h3>View Details</h3>
+        <p>See full specs, photos, amenities, and neighbourhood info.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">03 — CONNECT</div>
+        <h3>Contact Agent</h3>
+        <p>Reach the agent directly via email or WhatsApp — instant.</p>
+      </div>
+      <div class="how-step" style="background:rgba(188,100,60,0.06);border-color:rgba(188,100,60,0.25);">
+        <div class="how-step-num" style="color:var(--terracotta)">04 — LIST</div>
+        <h3>List Your Property</h3>
+        <p>Agents post listings free — reviewed within 24 hours and live to thousands.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Locations Section -->
+  <section class="section-locations" id="locations">
+    <div class="section-header">
+      <div class="section-label">Popular Locations</div>
+      <h2>Find properties in<br>every corner of The Gambia</h2>
+    </div>
+    <div class="locations-grid">
+      <div class="location-chip" onclick="quickFilterLocation('Fajara')">Fajara</div>
+      <div class="location-chip" onclick="quickFilterLocation('Kololi')">Kololi</div>
+      <div class="location-chip" onclick="quickFilterLocation('Bakau')">Bakau</div>
+      <div class="location-chip featured-chip" onclick="quickFilterLocation('Kairaba Avenue')">Kairaba Avenue ✦</div>
+      <div class="location-chip" onclick="quickFilterLocation('Bijilo')">Bijilo</div>
+      <div class="location-chip" onclick="quickFilterLocation('Brufut')">Brufut</div>
+      <div class="location-chip" onclick="quickFilterLocation('Banjul')">Banjul</div>
+      <div class="location-chip" onclick="quickFilterLocation('Serrekunda')">Serrekunda</div>
+      <div class="location-chip" onclick="quickFilterLocation('Lamin')">Lamin</div>
+      <div class="location-chip" onclick="quickFilterLocation('Brikama')">Brikama</div>
+      <div class="location-chip" onclick="quickFilterLocation('Kerr Serign')">Kerr Serign</div>
+      <div class="location-chip" onclick="quickFilterLocation('Sanyang')">Sanyang</div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <div class="section-cta">
+    <div class="cta-orb"></div>
+    <h2>Ready to find your<br><em>dream home in The Gambia?</em></h2>
+    <p>Join thousands of Gambians buying, selling and renting property on GamHub Estate.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-terracotta btn-lg" onclick="showView('search')">Browse Properties</button>
+      <button class="btn btn-outline btn-lg" onclick="showView('agent-portal')">List Your Property →</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="nav-logo">
+      <div class="nav-logo-icon">⬡</div>
+      GamHub Estate
+    </div>
+    <div class="footer-links">
+      <a href="#" onclick="showView('privacy');return false">Privacy</a>
+      <a href="#" onclick="showView('terms');return false">Terms</a>
+      <a href="mailto:gamhubestate@gmail.com">Contact</a>
+      <a href="https://wa.me/2206371941" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+    <div class="footer-copy">© 2026 GamHub Estate · Made for The Gambia 🇬🇲</div>
+  </footer>
+
+</div><!-- /view-landing -->
+
+<!-- ============================================================
+     VIEW 2 — PROPERTY SEARCH
+     ============================================================ -->
+<div id="view-search" class="view">
+
+  <div class="ps-topbar">
+    <div class="ps-topbar-inner">
+      <div class="ps-topbar-left">
+        <h2 class="ps-topbar-title">🏠 Properties</h2>
+        <p class="ps-topbar-sub">Find your next home in The Gambia</p>
+      </div>
+      <div class="ps-topbar-right">
+        <button class="btn btn-ghost btn-sm" onclick="showView('landing')">← Home</button>
+        <button class="btn btn-terracotta btn-sm" onclick="showView('agent-portal')">List a Property</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ps-search-section">
+    <div class="ps-search-card">
+      <div class="ps-search-row">
+        <div class="ps-search-input-wrap">
+          <span class="ps-search-icon">🔍</span>
+          <input
+            class="ps-search-input"
+            id="ps-keyword"
+            type="text"
+            placeholder="Search by title, location or agent…"
+            oninput="filterProperties()"
+            autocomplete="off"
+          >
+        </div>
+        <div class="ps-search-selects">
+          <select class="ps-select" id="ps-type" onchange="filterProperties()">
+            <option value="">All Types</option>
+            <option value="For Sale">For Sale</option>
+            <option value="For Rent">For Rent</option>
+            <option value="Commercial">Commercial</option>
+            <option value="Land">Land</option>
+          </select>
+          <select class="ps-select" id="ps-category" onchange="filterProperties()">
+            <option value="">All Categories</option>
+            <option value="Apartment">Apartment</option>
+            <option value="House">House</option>
+            <option value="Villa">Villa</option>
+            <option value="Compound">Compound</option>
+            <option value="Office">Office</option>
+            <option value="Shop">Shop</option>
+            <option value="Plot">Plot</option>
+          </select>
+          <select class="ps-select" id="ps-location" onchange="filterProperties()">
+            <option value="">Any Location</option>
+            <option>Banjul</option>
+            <option>Fajara</option>
+            <option>Kololi</option>
+            <option>Bakau</option>
+            <option>Serrekunda</option>
+            <option>Kairaba Avenue</option>
+            <option>Bijilo</option>
+            <option>Brufut</option>
+            <option>Lamin</option>
+            <option>Brikama</option>
+            <option>Kerr Serign</option>
+            <option>Sanyang</option>
+          </select>
+          <select class="ps-select" id="ps-beds" onchange="filterProperties()">
+            <option value="">Any Beds</option>
+            <option value="1">1+ Beds</option>
+            <option value="2">2+ Beds</option>
+            <option value="3">3+ Beds</option>
+            <option value="4">4+ Beds</option>
+            <option value="5">5+ Beds</option>
+          </select>
+        </div>
+        <button class="btn btn-terracotta ps-search-btn" onclick="filterProperties()">Search</button>
+      </div>
+      <div class="ps-result-meta" id="ps-result-meta"></div>
+    </div>
+  </div>
+
+  <div class="ps-list-wrap">
+    <div class="ps-property-grid" id="ps-property-grid"></div>
+    <div class="ps-empty" id="ps-empty" style="display:none">
+      <div class="ps-empty-icon">🏚️</div>
+      <h3>No properties match your search</h3>
+      <p>Try different keywords, type, or location.</p>
+      <button class="btn btn-terracotta btn-sm"
+        onclick="document.getElementById('ps-keyword').value='';
+                 document.getElementById('ps-type').value='';
+                 document.getElementById('ps-category').value='';
+                 document.getElementById('ps-location').value='';
+                 document.getElementById('ps-beds').value='';
+                 filterProperties()">Clear Filters</button>
+    </div>
+  </div>
+
+  <!-- Property Detail Modal -->
+  <div class="pd-backdrop" id="pd-backdrop" role="dialog" aria-modal="true" aria-labelledby="pd-title" style="display:none">
+    <div class="pd-modal" id="pd-modal">
+      <div class="pd-modal-head">
+        <div class="pd-modal-head-left">
+          <div class="pd-modal-logo-wrap" id="pd-logo-wrap"></div>
+          <div>
+            <h2 class="pd-modal-title" id="pd-title"></h2>
+            <p class="pd-modal-agent" id="pd-agent"></p>
+          </div>
+        </div>
+        <button class="pd-close" id="pd-close" aria-label="Close property details">✕</button>
+      </div>
+      <div class="pd-chips-row" id="pd-chips-row"></div>
+      <div class="pd-modal-body" id="pd-modal-body">
+        <section class="pd-section" id="pd-sec-agent">
+          <h3 class="pd-section-title"><span class="pd-section-icon">🏢</span> Agent / Seller Details</h3>
+          <div class="pd-detail-grid" id="pd-agent-grid"></div>
+        </section>
+        <section class="pd-section" id="pd-sec-specs">
+          <h3 class="pd-section-title"><span class="pd-section-icon">📋</span> Property Specs</h3>
+          <div class="pd-detail-grid" id="pd-specs-grid"></div>
+        </section>
+        <section class="pd-section" id="pd-sec-photos">
+          <h3 class="pd-section-title"><span class="pd-section-icon">📷</span> Photos</h3>
+          <div id="pd-photo-gallery" class="pd-photo-gallery"></div>
+        </section>
+        <section class="pd-section" id="pd-sec-desc">
+          <h3 class="pd-section-title"><span class="pd-section-icon">📝</span> About This Property</h3>
+          <p class="pd-body-text" id="pd-description"></p>
+        </section>
+        <section class="pd-section" id="pd-sec-features">
+          <h3 class="pd-section-title"><span class="pd-section-icon">✅</span> Features &amp; Amenities</h3>
+          <div class="pd-list-text" id="pd-features"></div>
+        </section>
+        <section class="pd-section pd-section-contact" id="pd-sec-contact">
+          <h3 class="pd-section-title"><span class="pd-section-icon">🚀</span> Contact Agent</h3>
+          <p class="pd-body-text" id="pd-contact-info"></p>
+          <div class="pd-contact-actions" id="pd-contact-actions"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /view-search -->
+
+<!-- ============================================================
+     VIEW 3 — PROPERTY DETAIL (FULL PAGE)
+     ============================================================ -->
+<div id="view-property-detail" class="view">
+  <div class="pd-page-topbar">
+    <button class="pd-page-back" id="pd-back-btn">← Back to Properties</button>
+  </div>
+  <div class="pd-page-hero">
+    <div class="pd-page-logo" id="pd-page-logo"></div>
+    <div class="pd-page-hero-info">
+      <h1 class="pd-page-title" id="pd-page-title"></h1>
+      <p class="pd-page-agent" id="pd-page-agent"></p>
+      <div class="pd-chips-row" id="pd-page-chips"></div>
+    </div>
+  </div>
+  <div class="pd-page-content">
+    <div class="pd-page-sections">
+      <section class="pd-section" id="pd-page-sec-photos">
+        <h3 class="pd-section-title"><span class="pd-section-icon">📷</span> Photos</h3>
+        <div id="pd-page-photo-gallery" class="pd-photo-gallery"></div>
+      </section>
+      <section class="pd-section" id="pd-page-sec-agent">
+        <h3 class="pd-section-title"><span class="pd-section-icon">🏢</span> Agent / Seller Details</h3>
+        <div class="pd-detail-grid" id="pd-page-agent-grid"></div>
+      </section>
+      <section class="pd-section" id="pd-page-sec-specs">
+        <h3 class="pd-section-title"><span class="pd-section-icon">📋</span> Property Specs</h3>
+        <div class="pd-detail-grid" id="pd-page-specs-grid"></div>
+      </section>
+      <section class="pd-section" id="pd-page-sec-desc">
+        <h3 class="pd-section-title"><span class="pd-section-icon">📝</span> About This Property</h3>
+        <p class="pd-body-text" id="pd-page-description"></p>
+      </section>
+      <section class="pd-section" id="pd-page-sec-features">
+        <h3 class="pd-section-title"><span class="pd-section-icon">✅</span> Features &amp; Amenities</h3>
+        <div class="pd-list-text" id="pd-page-features"></div>
+      </section>
+      <section class="pd-section pd-section-contact" id="pd-page-sec-contact">
+        <h3 class="pd-section-title"><span class="pd-section-icon">🚀</span> Contact Agent</h3>
+        <p class="pd-body-text" id="pd-page-contact-info"></p>
+      </section>
+    </div>
+    <div class="pd-page-actions" id="pd-page-actions"></div>
+  </div>
+</div><!-- /view-property-detail -->
+
+<!-- ============================================================
+     VIEW 4 — AGENT PORTAL (List a Property)
+     ============================================================ -->
+<div id="view-agent-portal" class="view">
+
+  <div class="agent-topbar">
+    <h2>🏢 Agent Portal <span class="agent-topbar-badge">For Agents &amp; Private Sellers</span></h2>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="btn btn-ghost btn-sm" onclick="showView('landing')">← Home</button>
+    </div>
+  </div>
+
+  <div class="agent-body">
+
+    <div class="agent-stats-bar">
+      <div class="agent-stat">
+        <div class="agent-stat-num" id="stat-total">0</div>
+        <div class="agent-stat-label">Listings Posted</div>
+      </div>
+      <div class="agent-stat">
+        <div class="agent-stat-num" id="stat-active">0</div>
+        <div class="agent-stat-label">Active Listings</div>
+      </div>
+      <div class="agent-stat">
+        <div class="agent-stat-num" id="stat-pending">0</div>
+        <div class="agent-stat-label">Awaiting Review</div>
+      </div>
+      <div class="agent-stat">
+        <div class="agent-stat-num">GMD 0</div>
+        <div class="agent-stat-label">Total Spend</div>
+      </div>
+    </div>
+
+    <div class="portal-tabs">
+      <button class="portal-tab active" onclick="switchPortalTab('post', this)">📝 Post a Property</button>
+      <button class="portal-tab" onclick="switchPortalTab('manage', this)">📋 My Listings</button>
+    </div>
+
+    <!-- TAB 1: Post a Property -->
+    <div class="portal-panel active" id="panel-post">
+      <div class="post-property-layout">
+        <div>
+          <!-- Success state -->
+          <div class="submission-success" id="submission-success">
+            <div class="success-icon">🎉</div>
+            <h3>Property Listed Successfully!</h3>
+            <p>Your listing has been submitted and is under review. It will appear on GamHub Estate within 24 hours.</p>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+              <button class="btn btn-terracotta" onclick="resetPostForm()">Post Another Property</button>
+              <button class="btn btn-ghost" onclick="switchPortalTab('manage', document.querySelector('.portal-tab:nth-child(2)'))">View My Listings →</button>
+            </div>
+          </div>
+
+          <!-- Post form -->
+          <div class="post-property-form" id="post-property-form">
+            <h3>List a Property</h3>
+            <p class="form-subtitle">Reach thousands of qualified buyers and renters across The Gambia. Free basic listing, no credit card required.</p>
+
+            <div class="section-label" style="margin-bottom:20px">Agent / Seller Details</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Agent / Seller Name *</label>
+                <input type="text" class="form-control" id="pp-agent-name" placeholder="e.g. Gambia Realty Group or your name" oninput="updatePropertyPreview()">
+              </div>
+              <div class="form-group">
+                <label>Business / Agency Name</label>
+                <input type="text" class="form-control" id="pp-company" placeholder="e.g. Pacific Real Estate Ltd" oninput="updatePropertyPreview()">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Contact Email *</label>
+                <input type="email" class="form-control" id="pp-email" placeholder="agent@example.gm">
+              </div>
+              <div class="form-group">
+                <label>WhatsApp / Phone *</label>
+                <input type="text" class="form-control" id="pp-phone" placeholder="+220 7XX XXXX">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Agency Website <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+              <input type="url" class="form-control" id="pp-website" placeholder="https://youragency.gm">
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section-label" style="margin-bottom:20px">Property Details</div>
+
+            <div class="form-group">
+              <label>Property Title *</label>
+              <input type="text" class="form-control" id="pp-title" placeholder="e.g. Stunning 4-Bedroom Villa in Fajara with Pool" oninput="updatePropertyPreview()">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Listing Type *</label>
+                <select class="form-control" id="pp-listing-type" onchange="updatePropertyPreview()">
+                  <option value="">Select type</option>
+                  <option value="For Sale">For Sale</option>
+                  <option value="For Rent">For Rent</option>
+                  <option value="Commercial">Commercial</option>
+                  <option value="Land">Land</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Category *</label>
+                <select class="form-control" id="pp-category" onchange="updatePropertyPreview()">
+                  <option value="">Select category</option>
+                  <option>Apartment</option>
+                  <option>House</option>
+                  <option>Villa</option>
+                  <option>Compound</option>
+                  <option>Duplex</option>
+                  <option>Studio</option>
+                  <option>Office</option>
+                  <option>Shop / Retail</option>
+                  <option>Warehouse</option>
+                  <option>Plot / Land</option>
+                  <option>Farm Land</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Location *</label>
+                <select class="form-control" id="pp-location" onchange="updatePropertyPreview()">
+                  <option value="">Select location</option>
+                  <option>Banjul</option>
+                  <option>Fajara</option>
+                  <option>Kololi</option>
+                  <option>Bakau</option>
+                  <option>Serrekunda</option>
+                  <option>Kairaba Avenue</option>
+                  <option>Kanifing</option>
+                  <option>Bijilo</option>
+                  <option>Brufut</option>
+                  <option>Kerr Serign</option>
+                  <option>Lamin</option>
+                  <option>Brikama</option>
+                  <option>Sanyang</option>
+                  <option>Tanji</option>
+                  <option>Basse</option>
+                  <option>Other / Upcountry</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Street / Neighbourhood <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+                <input type="text" class="form-control" id="pp-street" placeholder="e.g. Atlantic Boulevard, off Kairaba Ave" oninput="updatePropertyPreview()">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Price / Rent *</label>
+                <input type="text" class="form-control" id="pp-price" placeholder="e.g. GMD 4,500,000 or GMD 18,000/month" oninput="updatePropertyPreview()">
+              </div>
+              <div class="form-group">
+                <label>Price Type</label>
+                <select class="form-control" id="pp-price-type" onchange="updatePropertyPreview()">
+                  <option value="fixed">Fixed Price</option>
+                  <option value="negotiable">Negotiable</option>
+                  <option value="monthly">Monthly Rent</option>
+                  <option value="yearly">Yearly Rent</option>
+                  <option value="poa">Price on Application</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Bedrooms</label>
+                <select class="form-control" id="pp-bedrooms" onchange="updatePropertyPreview()">
+                  <option value="">N/A (commercial/land)</option>
+                  <option value="Studio">Studio</option>
+                  <option value="1">1 Bedroom</option>
+                  <option value="2">2 Bedrooms</option>
+                  <option value="3">3 Bedrooms</option>
+                  <option value="4">4 Bedrooms</option>
+                  <option value="5">5 Bedrooms</option>
+                  <option value="6+">6+ Bedrooms</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Bathrooms</label>
+                <select class="form-control" id="pp-bathrooms">
+                  <option value="">N/A</option>
+                  <option value="1">1 Bathroom</option>
+                  <option value="2">2 Bathrooms</option>
+                  <option value="3">3 Bathrooms</option>
+                  <option value="4">4+ Bathrooms</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Property Size <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+                <input type="text" class="form-control" id="pp-size" placeholder="e.g. 280 sqm or 0.5 acres">
+              </div>
+              <div class="form-group">
+                <label>Available From</label>
+                <input type="date" class="form-control" id="pp-available">
+              </div>
+            </div>
+
+            <div class="form-group form-group-counted">
+              <label>Property Description * <span style="color:var(--muted);font-weight:400">(min 100 characters)</span></label>
+              <textarea class="form-control" id="pp-description" rows="7"
+                placeholder="Describe the property in detail — layout, condition, surroundings, what makes it special, distance to key landmarks..."
+                oninput="updatePropertyPreview();updateCharCount('pp-description','pp-desc-count',3000)"></textarea>
+              <span class="char-counter" id="pp-desc-count">0 / 3000</span>
+            </div>
+
+            <div class="form-group">
+              <label>Features &amp; Amenities <span style="color:var(--muted);font-weight:400">(select all that apply)</span></label>
+              <div class="amenities-grid" id="amenities-grid">
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🏊 Swimming Pool</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">⚡ Generator</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">💧 Borehole</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🔒 Security / Guard</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🌳 Garden</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🚗 Parking / Garage</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🌡️ Air Conditioning</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">📡 Satellite TV</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">☀️ Solar Panels</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">📦 Storage Room</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🏗️ Compound Wall</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🌊 Sea View</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🛁 En-suite</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🍳 Modern Kitchen</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">📶 WiFi Ready</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🏠 Furnished</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🔑 Gated Community</span>
+                <span class="amenity-chip" onclick="toggleAmenity(this)">🏪 Near Market</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Photo URLs <span style="color:var(--muted);font-weight:400">(paste up to 6 direct image links)</span></label>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+                Upload photos to a free host like <a href="https://imgbb.com" target="_blank" style="color:var(--terracotta)">imgbb.com</a> and paste the direct image URLs below, one per line.
+              </div>
+              <textarea class="form-control" id="pp-photos" rows="4"
+                placeholder="https://i.ibb.co/yourphoto1.jpg&#10;https://i.ibb.co/yourphoto2.jpg&#10;https://i.ibb.co/yourphoto3.jpg"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Google Maps Link <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+              <input type="url" class="form-control" id="pp-map-link" placeholder="https://maps.google.com/?q=...">
+            </div>
+
+            <div class="form-group">
+              <label>Logo / Agency Photo URL <span style="color:var(--muted);font-weight:400">(optional — shown on listing card)</span></label>
+              <input type="url" class="form-control" id="pp-logo-url" placeholder="https://yoursite.gm/logo.png" oninput="updatePropertyPreview()">
+              <div style="font-size:12px;color:var(--muted);margin-top:6px">
+                Upload your agency logo to <a href="https://imgbb.com" target="_blank" style="color:var(--terracotta)">imgbb.com</a> and paste the direct link here.
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section-label" style="margin-bottom:20px">Choose a Plan</div>
+            <div class="plan-cards">
+              <div class="plan-card selected" onclick="selectPlan(this,'free')" data-plan="free">
+                <div class="plan-card-header">
+                  <span class="plan-name">🆓 Free Listing</span>
+                  <span class="plan-price free">GMD 0</span>
+                </div>
+                <ul class="plan-features">
+                  <li>Listed for 14 days</li>
+                  <li>Standard card on property board</li>
+                  <li>Reviewed within 24 hours</li>
+                  <li>Direct contact button for buyers</li>
+                </ul>
+              </div>
+              <div class="plan-card" onclick="selectPlan(this,'featured')" data-plan="featured">
+                <div class="plan-card-header">
+                  <span class="plan-name">⭐ Featured Listing</span>
+                  <span class="plan-price">GMD 25</span>
+                </div>
+                <ul class="plan-features">
+                  <li>Everything in Free</li>
+                  <li>Listed for 30 days</li>
+                  <li>Gold "Featured" badge on card</li>
+                  <li>Priority position in search results</li>
+                  <li>Blast to 2,000+ registered buyers</li>
+                </ul>
+              </div>
+              <div class="plan-card" onclick="selectPlan(this,'premium')" data-plan="premium">
+                <div class="plan-card-header">
+                  <span class="plan-name">🏆 Premium Listing</span>
+                  <span class="plan-price">GMD 50</span>
+                </div>
+                <ul class="plan-features">
+                  <li>Everything in Featured</li>
+                  <li>Listed for 60 days</li>
+                  <li>Pinned to top of search results</li>
+                  <li>Photo gallery on card</li>
+                  <li>Agency logo displayed prominently</li>
+                  <li>Social media feature on our pages</li>
+                </ul>
+              </div>
+            </div>
+
+            <div style="margin-top:32px;">
+              <button class="btn btn-terracotta btn-lg btn-full" id="submit-property-btn" onclick="submitPropertyPost()">
+                <div class="submit-btn-inner">
+                  <div class="submit-spinner" id="submit-spinner"></div>
+                  <span class="submit-text" id="submit-btn-label">✦ Submit Free Listing</span>
+                </div>
+              </button>
+              <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px" id="submit-btn-note">
+                Free listings are reviewed manually within 24 hours. No payment required.
+              </p>
+            </div>
+          </div><!-- /post-property-form -->
+        </div>
+
+        <!-- Sidebar -->
+        <div class="post-property-sidebar" id="post-property-sidebar">
+          <div class="sidebar-card">
+            <h4>👁 Live Preview</h4>
+            <div class="property-preview-card">
+              <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;margin-bottom:8px">HOW YOUR LISTING WILL APPEAR</div>
+              <div id="prev-plan-badge" style="margin-bottom:8px"></div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <div id="prev-logo-wrap"><div class="property-card-logo-placeholder" style="width:36px;height:36px;font-size:13px">🏡</div></div>
+                <div>
+                  <div class="preview-prop-title" id="prev-title">Property Title</div>
+                  <div class="preview-prop-agent" id="prev-agent">Agent Name</div>
+                </div>
+              </div>
+              <div class="preview-prop-meta">
+                <span class="preview-meta-item" id="prev-location">📍 Location</span>
+                <span class="preview-meta-item" id="prev-type">🏠 Type</span>
+                <span class="preview-meta-item" id="prev-beds" style="display:none"></span>
+                <span class="preview-meta-item" id="prev-price" style="display:none"></span>
+              </div>
+              <div class="preview-prop-desc" id="prev-desc">Your property description will appear here…</div>
+            </div>
+          </div>
+          <div class="sidebar-card">
+            <h4>📊 Why List Here?</h4>
+            <div class="sidebar-stat"><span>Monthly visitors</span><span class="sidebar-stat-val">3,000+</span></div>
+            <div class="sidebar-stat"><span>Registered users</span><span class="sidebar-stat-val">1,500+</span></div>
+            <div class="sidebar-stat"><span>WhatsApp subscribers</span><span class="sidebar-stat-val">800+</span></div>
+            <div class="sidebar-stat"><span>Avg. response time</span><span class="sidebar-stat-val">&lt; 3 hrs</span></div>
+            <div class="sidebar-stat"><span>Free listing cost</span><span class="sidebar-stat-val">GMD 0</span></div>
+          </div>
+          <div class="sidebar-card">
+            <h4>💡 Tips for a Great Listing</h4>
+            <p>
+              Listings with <strong style="color:var(--terracotta)">3+ photos get 4× more enquiries</strong>.
+              Always include a clear price — even "negotiable" listings with a guide price get more views.
+              Add your WhatsApp number for instant buyer contact.
+            </p>
+          </div>
+          <div class="sidebar-card">
+            <h4>🔍 Property Seekers Board</h4>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:14px">
+              Browse buyers and renters who have already posted what they're looking for — match your listings to ready buyers instantly.
+            </p>
+            <button class="btn btn-outline btn-full btn-sm" onclick="showView('seeker-board')">🌟 Browse Seekers →</button>
+          </div>
+        </div>
+      </div><!-- /post-property-layout -->
+    </div><!-- /panel-post -->
+
+    <!-- TAB 2: My Listings -->
+    <div class="portal-panel" id="panel-manage">
+      <div class="manage-listings-header">
+        <h3>My Property Listings</h3>
+        <button class="btn btn-terracotta btn-sm" onclick="switchPortalTab('post', document.querySelector('.portal-tab'))">+ Post New Property</button>
+      </div>
+      <div id="manage-listings-list"></div>
+    </div>
+
+  </div><!-- /agent-body -->
+</div><!-- /view-agent-portal -->
+
+<!-- ============================================================
+     VIEW 5 — PROPERTY SEEKERS BOARD
+     ============================================================ -->
+<div id="view-seeker-board" class="view">
+
+  <div class="sb-topbar">
+    <div class="sb-topbar-inner">
+      <div class="sb-topbar-left">
+        <h2 class="sb-topbar-title">🔍 Property Seekers</h2>
+        <p class="sb-topbar-sub">Buyers and renters looking for their next home</p>
+      </div>
+      <div class="sb-topbar-right">
+        <button class="btn btn-ghost btn-sm" onclick="showView('landing')">← Home</button>
+        <button class="btn btn-terracotta btn-sm" id="sb-post-btn" onclick="sbShowPostForm()">
+          + Post My Requirements
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-search-section">
+    <div class="sb-search-card">
+      <div class="sb-search-row">
+        <div class="sb-search-input-wrap">
+          <span class="sb-search-icon">🔍</span>
+          <input
+            class="sb-search-input"
+            id="sb-keyword"
+            type="text"
+            placeholder="Search by name, location, or property type…"
+            oninput="sbFilterSeekers()"
+            autocomplete="off"
+          >
+        </div>
+        <div class="sb-search-selects">
+          <select class="sb-select" id="sb-type" onchange="sbFilterSeekers()">
+            <option value="">Any Type</option>
+            <option value="For Sale">To Buy</option>
+            <option value="For Rent">To Rent</option>
+            <option value="Commercial">Commercial</option>
+            <option value="Land">Land</option>
+          </select>
+          <select class="sb-select" id="sb-timeline" onchange="sbFilterSeekers()">
+            <option value="">Any Timeline</option>
+            <option value="Immediately">Immediately</option>
+            <option value="1 Month">Within 1 Month</option>
+            <option value="3 Months">Within 3 Months</option>
+            <option value="Flexible">Flexible</option>
+          </select>
+        </div>
+        <button class="btn btn-terracotta sb-search-btn" onclick="sbFilterSeekers()">Search</button>
+      </div>
+      <div class="sb-result-meta" id="sb-result-meta"></div>
+    </div>
+  </div>
+
+  <div class="sb-list-wrap">
+    <div class="sb-seeker-grid" id="sb-seeker-grid"></div>
+    <div class="sb-empty" id="sb-empty" style="display:none">
+      <div class="sb-empty-icon">🏚️</div>
+      <h3>No seekers match your search</h3>
+      <p>Try different keywords or clear your filters.</p>
+      <button class="btn btn-terracotta btn-sm"
+        onclick="document.getElementById('sb-keyword').value='';
+                 document.getElementById('sb-type').value='';
+                 document.getElementById('sb-timeline').value='';
+                 sbFilterSeekers()">Clear Filters</button>
+    </div>
+  </div>
+
+  <!-- Post Seeker Profile Modal -->
+  <div class="sb-post-backdrop" id="sb-post-backdrop" style="display:none">
+    <div class="sb-post-modal" id="sb-post-modal" role="dialog" aria-modal="true">
+      <div class="sb-post-header">
+        <h3>Post My Property Requirements</h3>
+        <button class="sb-modal-close" onclick="sbClosePostForm()">✕</button>
+      </div>
+      <div class="sb-post-form" id="sb-post-form">
+        <p class="sb-post-subtitle">Let agents and sellers find you — free to post.</p>
+
+        <div class="sb-form-section-label">Your Details</div>
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" class="form-control" id="sk-name" placeholder="e.g. Ousman Bojang">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Contact Email *</label>
+            <input type="email" class="form-control" id="sk-email" placeholder="you@email.com">
+          </div>
+          <div class="form-group">
+            <label>WhatsApp / Phone <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+            <input type="text" class="form-control" id="sk-phone" placeholder="+220 7XX XXXX">
+          </div>
+        </div>
+
+        <div class="sb-form-section-label" style="margin-top:24px">What Are You Looking For?</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Looking to *</label>
+            <select class="form-control" id="sk-listing-type">
+              <option value="">Select</option>
+              <option value="For Sale">Buy a property</option>
+              <option value="For Rent">Rent a property</option>
+              <option value="Commercial">Lease commercial space</option>
+              <option value="Land">Buy land / plot</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Property Type</label>
+            <select class="form-control" id="sk-category">
+              <option value="">Any type</option>
+              <option>Apartment</option>
+              <option>House</option>
+              <option>Villa</option>
+              <option>Compound</option>
+              <option>Office</option>
+              <option>Shop / Retail</option>
+              <option>Plot / Land</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Preferred Location(s) *</label>
+            <input type="text" class="form-control" id="sk-location" placeholder="e.g. Fajara, Bakau or Kololi">
+          </div>
+          <div class="form-group">
+            <label>Minimum Bedrooms</label>
+            <select class="form-control" id="sk-bedrooms">
+              <option value="">No preference</option>
+              <option value="1">1+ Beds</option>
+              <option value="2">2+ Beds</option>
+              <option value="3">3+ Beds</option>
+              <option value="4">4+ Beds</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Budget *</label>
+            <input type="text" class="form-control" id="sk-budget" placeholder="e.g. GMD 2M – 4M or GMD 15,000/month">
+          </div>
+          <div class="form-group">
+            <label>Timeline *</label>
+            <select class="form-control" id="sk-timeline">
+              <option value="Immediately">Immediately</option>
+              <option value="1 Month">Within 1 Month</option>
+              <option value="3 Months">Within 3 Months</option>
+              <option value="Flexible">Flexible</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Additional Requirements <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+          <textarea class="form-control" id="sk-requirements" rows="3"
+            placeholder="e.g. Must have generator, compound wall, parking. Needs to be near a school..."></textarea>
+        </div>
+
+        <div style="margin-top:24px">
+          <button class="btn btn-terracotta btn-lg btn-full" onclick="sbSubmitSeeker()">
+            ✦ Post My Requirements Free
+          </button>
+          <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px">
+            Free · Visible to verified agents and private sellers
+          </p>
+        </div>
+      </div>
+
+      <!-- Success -->
+      <div class="sb-post-success" id="sb-post-success" style="display:none">
+        <div style="font-size:52px;margin-bottom:16px">🎉</div>
+        <h3>Requirements Posted!</h3>
+        <p>Agents and sellers can now find and contact you directly. Good luck finding your home!</p>
+        <button class="btn btn-terracotta" onclick="sbClosePostForm();sbRenderSeekers(SB_SEEKERS)">
+          View Seekers Board →
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /view-seeker-board -->
+
+<!-- ============================================================
+     VIEW 6 — PRIVACY POLICY
+     ============================================================ -->
+<div id="view-privacy" class="view">
+  <div class="legal-topbar">
+    <div class="legal-topbar-title">Privacy Policy</div>
+    <span class="legal-topbar-date">Last updated: May 2026</span>
+    <button class="btn btn-ghost btn-sm" onclick="showView('landing')">← Back</button>
+  </div>
+  <div class="legal-body">
+    <div class="legal-hero">
+      <div class="legal-last-updated">📅 Last updated: May 2026</div>
+      <h1>Privacy Policy</h1>
+      <p>GamHub Estate is committed to protecting your personal information. This policy explains what data we collect, how it is stored, and your rights as a user in The Gambia.</p>
+    </div>
+    <div class="legal-section" id="priv-1">
+      <div class="legal-section-num">Section 01</div>
+      <h2>Who We Are</h2>
+      <p><strong>GamHub Estate</strong> is a property marketplace designed for buyers, sellers, renters and agents in The Gambia. We help people find, list and connect around property transactions across the country.</p>
+      <div class="legal-contact-card">
+        <div class="legal-contact-icon">✉</div>
+        <div><h4>Data Controller</h4><a href="mailto:gamhubestate@gmail.com">gamhubestate@gmail.com</a></div>
+      </div>
+    </div>
+    <div class="legal-section" id="priv-2">
+      <div class="legal-section-num">Section 02</div>
+      <h2>What Data We Collect</h2>
+      <p><strong>Account Data:</strong> Email address used as your account identifier via Supabase Auth magic link.</p>
+      <p><strong>Property Listing Data:</strong> Agent name, contact email, phone, property title, price, location, description, photos and amenities.</p>
+      <p><strong>Seeker Data:</strong> Name, email, phone, property requirements and budget — only what you choose to post publicly.</p>
+      <p><strong>Payment Data:</strong> We do not store card or mobile money details. All payments are processed by ModemPay.</p>
+    </div>
+    <div class="legal-section" id="priv-3">
+      <div class="legal-section-num">Section 03</div>
+      <h2>How We Use Your Data</h2>
+      <ul>
+        <li>To publish and display your property listings or seeker profiles</li>
+        <li>To authenticate your account via Supabase magic link</li>
+        <li>To process payments via ModemPay for paid listing plans</li>
+        <li>To prevent abuse and track free listing allowances</li>
+      </ul>
+      <div class="legal-highlight"><strong>We do not sell your personal data.</strong> We do not share your information with third parties for marketing purposes.</div>
+    </div>
+    <div class="legal-section" id="priv-4">
+      <div class="legal-section-num">Section 04</div>
+      <h2>Your Rights</h2>
+      <ul>
+        <li><strong>Right to access:</strong> Request a copy of all personal data we hold about you.</li>
+        <li><strong>Right to erasure:</strong> Email us to delete your account and all associated data.</li>
+        <li><strong>Right to rectification:</strong> Update your listings and contact information at any time.</li>
+      </ul>
+      <p>To exercise any rights, contact: <a href="mailto:gamhubestate@gmail.com" style="color:var(--terracotta)">gamhubestate@gmail.com</a></p>
+    </div>
+    <div class="legal-section">
+      <div class="legal-section-num">Section 05</div>
+      <h2>Contact Us</h2>
+      <div class="legal-contact-card">
+        <div class="legal-contact-icon">✉</div>
+        <div><h4>GamHub Estate — Privacy</h4><a href="mailto:gamhubestate@gmail.com">gamhubestate@gmail.com</a><div style="font-size:12px;color:var(--muted);margin-top:4px">We respond within 14 business days</div></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /view-privacy -->
+
+<!-- ============================================================
+     VIEW 7 — TERMS OF SERVICE
+     ============================================================ -->
+<div id="view-terms" class="view">
+  <div class="legal-topbar">
+    <div class="legal-topbar-title">Terms of Service</div>
+    <span class="legal-topbar-date">Last updated: May 2026</span>
+    <button class="btn btn-ghost btn-sm" onclick="showView('landing')">← Back</button>
+  </div>
+  <div class="legal-body">
+    <div class="legal-hero">
+      <div class="legal-last-updated">📅 Last updated: May 2026</div>
+      <h1>Terms of Service</h1>
+      <p>These terms govern your use of GamHub Estate, including browsing listings, posting properties, and using the Property Seekers Board. By using GamHub Estate you agree to these terms.</p>
+    </div>
+    <div class="legal-section">
+      <div class="legal-section-num">Section 01</div>
+      <h2>Acceptance of Terms</h2>
+      <p>By accessing or using GamHub Estate, you agree to be bound by these Terms of Service and our Privacy Policy. These terms apply to all users including property buyers, renters, agents, and private sellers.</p>
+    </div>
+    <div class="legal-section">
+      <div class="legal-section-num">Section 02</div>
+      <h2>Listing Rules</h2>
+      <ul>
+        <li><strong>Accuracy:</strong> All property information must be accurate and not misleading.</li>
+        <li><strong>Real listings only:</strong> You may only post genuine properties available for sale or rent.</li>
+        <li><strong>Legal compliance:</strong> All listings must comply with Gambian property law.</li>
+        <li><strong>Review period:</strong> All listings are reviewed before going live, typically within 24 hours.</li>
+        <li><strong>No fraudulent listings:</strong> Scam listings will be removed and reported to authorities.</li>
+      </ul>
+    </div>
+    <div class="legal-section">
+      <div class="legal-section-num">Section 03</div>
+      <h2>Free vs Paid Features</h2>
+      <div class="legal-highlight"><strong>Free features</strong> include browsing all listings, posting a Free listing (14 days), and posting on the Property Seekers Board.</div>
+      <p><strong>Paid plans:</strong> Featured Listing (GMD 25 — 30 days, priority placement) and Premium Listing (GMD 50 — 60 days, pinned + social feature). All paid transactions processed by ModemPay in GMD.</p>
+    </div>
+    <div class="legal-section">
+      <div class="legal-section-num">Section 04</div>
+      <h2>No Transaction Guarantee</h2>
+      <div class="legal-highlight"><strong>GamHub Estate does not guarantee any property transaction.</strong> We are a discovery and marketing platform, not a real estate agency. All transactions between buyers, sellers, and agents are independent of GamHub Estate.</div>
+    </div>
+    <div class="legal-section">
+      <div class="legal-section-num">Section 05</div>
+      <h2>Contact</h2>
+      <div class="legal-contact-card">
+        <div class="legal-contact-icon">✉</div>
+        <div><h4>GamHub Estate — Legal &amp; Support</h4><a href="mailto:gamhubestate@gmail.com">gamhubestate@gmail.com</a></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /view-terms -->
+
+<!-- ============================================================
+     COOKIE CONSENT BANNER
+     ============================================================ -->
+<div id="cookie-banner" style="display:none">
+  <div class="cookie-text">
+    <strong>Before you continue.</strong>
+    GamHub Estate stores your browsing preferences and session in your browser's local storage. We use Supabase (EU servers) for authentication and listing management. No advertising cookies. No data sold.
+  </div>
+  <div class="cookie-actions">
+    <button class="btn btn-ghost btn-sm" onclick="showView('privacy')">Privacy Policy</button>
+    <button class="btn btn-terracotta btn-sm" onclick="acceptCookies()">I Understand</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     AUTH MODAL
+     ============================================================ -->
+<div id="auth-overlay" class="auth-overlay" style="display:none" onclick="handleAuthOverlayClick(event)">
+  <div class="auth-modal" id="auth-modal">
+    <button class="auth-modal-close" onclick="closeAuthModal()">✕</button>
+    <div id="auth-step-email">
+      <div class="auth-icon">⬡</div>
+      <h3>Sign in to GamHub Estate</h3>
+      <p>Enter your email and we'll send you a magic link — no password needed. Works with any email.</p>
+      <div class="auth-form">
+        <input type="email" class="auth-input" id="auth-email-input"
+          placeholder="your@email.com"
+          onkeydown="if(event.key==='Enter')sendMagicLink()">
+        <div class="auth-error" id="auth-error-msg"></div>
+        <button class="auth-btn" id="auth-send-btn" onclick="sendMagicLink()">
+          <span id="auth-send-label">✉ Send Magic Link</span>
+        </button>
+      </div>
+      <p class="auth-note">Free to use · No password · No spam</p>
+    </div>
+    <div class="auth-sent" id="auth-step-sent">
+      <div class="auth-sent-icon">📬</div>
+      <h4>Check your inbox!</h4>
+      <p>We sent a sign-in link to <strong id="auth-sent-email"></strong>.<br>
+      Click the link in the email to sign in instantly.<br>It expires in 60 minutes.</p>
+      <button class="auth-btn" style="margin-top:16px;font-size:13px" onclick="closeAuthModal()">Got it — I'll check my email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WHATSAPP CHANNEL OVERLAY
+     ============================================================ -->
+<div id="wa-channel-overlay" onclick="wacJoin()" role="dialog" aria-modal="true" aria-label="Join GamHub Estate WhatsApp Channel">
+  <div class="wac-card" onclick="event.stopPropagation()">
+    <div class="wac-shimmer"></div>
+    <button class="wac-close" onclick="wacDismiss()" aria-label="Close">✕</button>
+    <div class="wac-logo-wrap">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.66 4.77 1.8 6.77L2 30l7.43-1.75A13.93 13.93 0 0 0 16 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm0 25.5a11.44 11.44 0 0 1-5.83-1.6l-.42-.25-4.3 1.01 1.04-4.2-.28-.44A11.5 11.5 0 1 1 16 27.5zm6.35-8.6c-.35-.17-2.06-1.02-2.38-1.13-.32-.12-.55-.17-.78.17-.23.35-.9 1.13-1.1 1.36-.2.23-.4.26-.75.09-.35-.17-1.48-.55-2.82-1.74-1.04-.93-1.75-2.08-1.95-2.43-.2-.35-.02-.54.15-.71.16-.16.35-.4.52-.6.17-.2.23-.35.35-.58.12-.23.06-.43-.03-.6-.09-.17-.78-1.88-1.07-2.57-.28-.67-.57-.58-.78-.59h-.67c-.23 0-.6.09-.91.43-.32.35-1.2 1.17-1.2 2.85s1.23 3.3 1.4 3.53c.17.23 2.42 3.7 5.86 5.19.82.35 1.46.56 1.96.72.82.26 1.57.22 2.16.13.66-.1 2.06-.84 2.35-1.66.29-.81.29-1.51.2-1.66-.08-.14-.31-.23-.66-.4z"/>
+      </svg>
+    </div>
+    <div class="wac-badge">
+      <span class="wac-badge-dot"></span>
+      Live Channel · Free to Join
+    </div>
+    <div class="wac-headline">
+      🏠 Get Instant Property Alerts<br><span>Before Anyone Else!</span>
+    </div>
+    <p class="wac-sub">
+      Join the <strong style="color:#fff">GamHub Estate WhatsApp Channel</strong> and get notified the moment new properties matching your search go live.
+    </p>
+    <ul class="wac-benefits">
+      <li>
+        <div class="wac-benefit-icon">✅</div>
+        <span>Be the <strong>first to see new listings</strong> the moment they go live</span>
+      </li>
+      <li>
+        <div class="wac-benefit-icon">⚡</div>
+        <span>Get <strong>real-time alerts</strong> on properties in your preferred location</span>
+      </li>
+      <li>
+        <div class="wac-benefit-icon">🏆</div>
+        <span>Stay <strong>ahead of other buyers</strong> and enquire before it's gone</span>
+      </li>
+    </ul>
+    <a href="https://whatsapp.com/channel/XXXXXXXXX"
+       target="_blank" rel="noopener noreferrer"
+       class="wac-cta"
+       onclick="wacDismiss()">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.66 4.77 1.8 6.77L2 30l7.43-1.75A13.93 13.93 0 0 0 16 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm0 25.5a11.44 11.44 0 0 1-5.83-1.6l-.42-.25-4.3 1.01 1.04-4.2-.28-.44A11.5 11.5 0 1 1 16 27.5zm6.35-8.6c-.35-.17-2.06-1.02-2.38-1.13-.32-.12-.55-.17-.78.17-.23.35-.9 1.13-1.1 1.36-.2.23-.4.26-.75.09-.35-.17-1.48-.55-2.82-1.74-1.04-.93-1.75-2.08-1.95-2.43-.2-.35-.02-.54.15-.71.16-.16.35-.4.52-.6.17-.2.23-.35.35-.58.12-.23.06-.43-.03-.6-.09-.17-.78-1.88-1.07-2.57-.28-.67-.57-.58-.78-.59h-.67c-.23 0-.6.09-.91.43-.32.35-1.2 1.17-1.2 2.85s1.23 3.3 1.4 3.53c.17.23 2.42 3.7 5.86 5.19.82.35 1.46.56 1.96.72.82.26 1.57.22 2.16.13.66-.1 2.06-.84 2.35-1.66.29-.81.29-1.51.2-1.66-.08-.14-.31-.23-.66-.4z"/>
+      </svg>
+      Join WhatsApp Channel Now
+    </a>
+    <p class="wac-proof">🇬🇲 <strong>Free forever</strong> · No spam · Unsubscribe anytime</p>
+    <span class="wac-dismiss-link" onclick="wacDismiss()">No thanks, I'll miss out</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     WHATSAPP FLOATING CHAT WIDGET
+     ============================================================ -->
+<div class="wa-widget">
+  <span class="wa-label" onclick="window.open('https://wa.me/2206371941','_blank','noopener,noreferrer')">Chat with us</span>
+  <a class="wa-btn" href="https://wa.me/2206371941" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.66 4.77 1.8 6.77L2 30l7.43-1.75A13.93 13.93 0 0 0 16 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm0 25.5a11.44 11.44 0 0 1-5.83-1.6l-.42-.25-4.3 1.01 1.04-4.2-.28-.44A11.5 11.5 0 1 1 16 27.5zm6.35-8.6c-.35-.17-2.06-1.02-2.38-1.13-.32-.12-.55-.17-.78.17-.23.35-.9 1.13-1.1 1.36-.2.23-.4.26-.75.09-.35-.17-1.48-.55-2.82-1.74-1.04-.93-1.75-2.08-1.95-2.43-.2-.35-.02-.54.15-.71.16-.16.35-.4.52-.6.17-.2.23-.35.35-.58.12-.23.06-.43-.03-.6-.09-.17-.78-1.88-1.07-2.57-.28-.67-.57-.58-.78-.59h-.67c-.23 0-.6.09-.91.43-.32.35-1.2 1.17-1.2 2.85s1.23 3.3 1.4 3.53c.17.23 2.42 3.7 5.86 5.19.82.35 1.46.56 1.96.72.82.26 1.57.22 2.16.13.66-.1 2.06-.84 2.35-1.66.29-.81.29-1.51.2-1.66-.08-.14-.31-.23-.66-.4z"/>
+    </svg>
+  </a>
+</div>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="script.js" defer></script>
+<script src="tour-system.js" defer></script>
+<script src="unlock-share-feature.js" defer></script>
+<script src="seeker-board.js" defer></script>
+</body>
+</html>
