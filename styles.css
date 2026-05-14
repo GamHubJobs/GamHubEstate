@@ -2258,16 +2258,17 @@ body.cookie-visible .wa-widget { bottom: 100px; }
    ============================================================ */
 @media (max-width: 1024px) {
   .types-grid { grid-template-columns: repeat(2, 1fr); }
-  .bento-grid { grid-template-columns: repeat(6, 1fr); }
-  .bento-card.col-4 { grid-column: span 6; }
-  .bento-card.col-5 { grid-column: span 6; }
-  .bento-card.col-7 { grid-column: span 6; }
-  .bento-card.col-8 { grid-column: span 6; }
+  .bento-grid { grid-template-columns: 1fr; }
+  .bento-card.col-4,
+  .bento-card.col-5,
+  .bento-card.col-6,
+  .bento-card.col-7,
+  .bento-card.col-8,
+  .bento-card.col-12 { grid-column: span 1; }
   .post-property-layout { grid-template-columns: 1fr; }
   .post-property-sidebar { display: none; }
   .agent-stats-bar { grid-template-columns: repeat(2, 1fr); }
 }
-
 /* ============================================================
    RESPONSIVE — MOBILE
    ============================================================ */
@@ -2357,7 +2358,17 @@ body.cookie-visible .wa-widget { bottom: 100px; }
   .ps-property-grid { grid-template-columns: 1fr; }
   .sb-card-footer { flex-direction: column; align-items: flex-start; }
 }
-
+/* Bento grid — ensure full width on mobile */
+  .bento-grid {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+  .bento-card {
+    grid-column: 1 / -1 !important;
+  }
+  .section-bento {
+    overflow: hidden;
+  }
 /* ============================================================
    PRINT — suppress UI chrome
    ============================================================ */
