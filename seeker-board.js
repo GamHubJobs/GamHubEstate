@@ -255,10 +255,34 @@ function sbSelectPlan(card, plan) {
 /* ============================================================
    INIT
    ============================================================ */
-function initSeekerBoard() {
+async function initSeekerBoard() {
   sbForceUnlockScroll();
   sbLoadLocalSeekers();
-  sbRenderSeekers(SB_SEEKERS);
+  sbRenderSeekers(SB_SEEKERS); // show sample data immediately
+  await sbLoadSeekersFromSupabase();
+}
+
+async function sbLoadSeekersFromSupabase() {
+  if (!window.supabase || !APP_CONFIG || APP_CONFIG.SUPABASE_URL.includes('YOUR_')) return;
+  try {
+    const res = await fetch(
+      APP_CONFIG.SUPABASE_URL + '/rest/v1/seekers?approved=eq.true&order=created_at.desc',
+      {
+        headers: {
+          'apikey': APP_CONFIG.SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + APP_CONFIG.SUPABASE_ANON_KEY,
+        }
+      }
+    );
+    if (!res.ok) return;
+    const dbSeekers = await res.json();
+    if (dbSeekers && dbSeekers.length) {
+      SB_SEEKERS = [...dbSeekers, ...SB_SAMPLE_SEEKERS];
+      sbRenderSeekers(SB_SEEKERS);
+    }
+  } catch(e) {
+    console.warn('[Supabase] Could not load seekers:', e.message);
+  }
 }
 
 /* ============================================================
