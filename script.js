@@ -4,7 +4,7 @@
 const APP_CONFIG = {
   SUPABASE_URL:        'https://pwexlhgizawjgteekkzf.supabase.co',
   SUPABASE_ANON_KEY:   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3ZXhsaGdpemF3amd0ZWVra3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5Mzg3NDgsImV4cCI6MjA5NDUxNDc0OH0.R-6dDci54V4lLewdUIuxAfLcZWRtAM5-PTszWqnCRII',
-  MODEMPAY_PUBLIC_KEY: 'YOUR_MODEMPAY_PUBLIC_KEY',
+  MODEMPAY_PUBLIC_KEY: 'pk_live_51ebe3d202c7d2dfd9b31befc1536124a934c826ea02ba062aae2914bf5c2a39',
 };
 
 /* ============================================================
