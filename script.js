@@ -2,8 +2,8 @@
    GAMHUB ESTATE — APP CONFIGURATION
    ============================================================ */
 const APP_CONFIG = {
-  SUPABASE_URL:        'https://YOUR_SUPABASE_URL.supabase.co',
-  SUPABASE_ANON_KEY:   'YOUR_SUPABASE_ANON_KEY',
+  SUPABASE_URL:        'https://pwexlhgizawjgteekkzf.supabase.co',
+  SUPABASE_ANON_KEY:   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3ZXhsaGdpemF3amd0ZWVra3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5Mzg3NDgsImV4cCI6MjA5NDUxNDc0OH0.R-6dDci54V4lLewdUIuxAfLcZWRtAM5-PTszWqnCRII',
   MODEMPAY_PUBLIC_KEY: 'YOUR_MODEMPAY_PUBLIC_KEY',
 };
 
