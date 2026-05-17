@@ -528,35 +528,8 @@ function quickFilterType(type) {
 /* ============================================================
    PROPERTY SEARCH — INIT & FILTER
    ============================================================ */
-async function initSearchView() {
-  renderProperties(getAllProperties()); // show sample data immediately
-  await loadPropertiesFromSupabase();  // then load real data
-}
-
-async function loadPropertiesFromSupabase() {
-  if (!supabaseClient) return;
-  try {
-    const res = await fetch(
-      APP_CONFIG.SUPABASE_URL + '/rest/v1/properties?approved=eq.true&order=created_at.desc',
-      {
-        headers: {
-          'apikey': APP_CONFIG.SUPABASE_ANON_KEY,
-          'Authorization': 'Bearer ' + APP_CONFIG.SUPABASE_ANON_KEY,
-        }
-      }
-    );
-    if (!res.ok) return;
-    const dbListings = await res.json();
-    if (dbListings && dbListings.length) {
-      // Merge DB listings with sample data, DB listings first
-      const combined = [...dbListings, ...PROPERTY_LISTINGS];
-      renderProperties(combined);
-      const meta = document.getElementById('ps-result-meta');
-      if (meta) meta.innerHTML = 'Showing <strong>' + combined.length + '</strong> properties';
-    }
-  } catch(e) {
-    console.warn('[Supabase] Could not load properties:', e.message);
-  }
+function initSearchView() {
+  renderProperties(getAllProperties());
 }
 /**
  * Returns all properties: featured+premium first, then standard,
