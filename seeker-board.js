@@ -19,6 +19,7 @@ const SB_SAMPLE_SEEKERS = [
   {
     id: 'seeker-001',
     name: 'Ousman Bojang',
+    avatar_url: 'assets/avatars/seeker-1.jpg',  // ADD THIS
     listing_type: 'For Sale',
     category: 'Villa',
     location_pref: 'Fajara or Bijilo',
@@ -36,6 +37,7 @@ const SB_SAMPLE_SEEKERS = [
   {
     id: 'seeker-002',
     name: 'Fatou Jallow',
+    avatar_url: 'assets/avatars/seeker-2.jpg',  // ADD THIS
     listing_type: 'For Rent',
     category: 'Apartment',
     location_pref: 'Kololi, Bakau or Fajara',
@@ -53,6 +55,7 @@ const SB_SAMPLE_SEEKERS = [
   {
     id: 'seeker-003',
     name: 'Lamin Ceesay',
+    avatar_url: 'assets/avatars/seeker-3.jpg',  // ADD THIS
     listing_type: 'Land',
     category: 'Plot',
     location_pref: 'Brufut, Kerr Serign or Sanyang',
@@ -70,6 +73,7 @@ const SB_SAMPLE_SEEKERS = [
   {
     id: 'seeker-004',
     name: 'Mariama Touray',
+    avatar_url: 'assets/avatars/seeker-4.jpg',  // ADD THIS
     listing_type: 'For Rent',
     category: 'House',
     location_pref: 'Serrekunda or Kanifing',
@@ -87,6 +91,7 @@ const SB_SAMPLE_SEEKERS = [
   {
     id: 'seeker-005',
     name: 'Ebrima Sanneh',
+    avatar_url: 'assets/avatars/seeker-5.jpg',  // ADD THIS
     listing_type: 'Commercial',
     category: 'Office',
     location_pref: 'Kairaba Avenue or Banjul',
@@ -104,6 +109,7 @@ const SB_SAMPLE_SEEKERS = [
   {
     id: 'seeker-006',
     name: 'Isatou Camara',
+    avatar_url: 'assets/avatars/seeker-6.jpg',  // ADD THIS
     listing_type: 'For Sale',
     category: 'Compound',
     location_pref: 'Banjul or Bakau',
@@ -214,16 +220,32 @@ function sbTimeAgo(iso) {
    AVATAR INITIAL HELPER
    ============================================================ */
 function sbGetAvatarHTML(seeker, size) {
-  const sz       = size || 50;
+  const sz = size || 50;
+
+  // If avatar photo exists, show it as a circular image
+  if (seeker.avatar_url) {
+    return `
+      <div class="sb-avatar sb-avatar-photo"
+           style="width:${sz}px;height:${sz}px;padding:0;border:2px solid rgba(188,100,60,0.3);overflow:hidden;"
+           aria-label="${sbEsc(seeker.name || 'Buyer')} avatar">
+        <img src="${sbEsc(seeker.avatar_url)}"
+             alt="${sbEsc(seeker.name || 'Buyer')}"
+             loading="lazy"
+             onerror="this.parentElement.innerHTML='${((seeker.name||'XX').split(' ').slice(0,2).map(w=>(w[0]||'').toUpperCase()).join(''))}';this.parentElement.classList.remove('sb-avatar-photo')"
+             style="width:100%;height:100%;object-fit:cover;display:block;">
+      </div>`;
+  }
+
+  // Fallback: show initials
   const initials = (seeker.name || 'XX').split(' ')
     .slice(0, 2).map(w => (w[0] || '').toUpperCase()).join('');
   return `
-    <div class="sb-avatar" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz * 0.36)}px"
+    <div class="sb-avatar"
+         style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz * 0.36)}px"
          aria-label="${sbEsc(seeker.name || 'Buyer')} avatar">
       ${initials}
     </div>`;
 }
-
 /* ============================================================
    PLAN HELPERS
    ============================================================ */
