@@ -138,8 +138,8 @@ const rateLimiter = (() => {
    FREE LISTING RATE LIMITER
    ============================================================ */
 const FREE_LISTING_RULES = {
-  property: { max: 2, windowDays: 7, label: 'property listing'  },
-  seeker:   { max: 2, windowDays: 7, label: 'seeker profile'    },
+  property: { max: 1, windowDays: 3000, label: 'property listing'  },
+  seeker:   { max: 1, windowDays: 3000, label: 'seeker profile'    },
 };
 const FREE_LISTING_KEYS = {
   property: 'ghe_free_property_timestamps',
@@ -372,7 +372,7 @@ const PROPERTY_LISTINGS = [
     description: 'Spacious three-bedroom house in Bakau New Town, just minutes from the beach. The property has a large living/dining area, modern kitchen, and a private garden with seating area. Master bedroom with en-suite. Solar panels installed for energy saving. Borehole and generator provide uninterrupted utilities. Quiet, family-friendly neighbourhood close to schools and healthcare.',
     amenities: ['⚡ Generator', '💧 Borehole', '🌳 Garden', '🌡️ Air Conditioning', '🏗️ Compound Wall', '☀️ Solar Panels', '🛁 En-suite', '🔒 Security / Guard'],
     photos: [
-      'https://images.unsplash.com/photo-1570129477492-45c003dc44e2?w=800&q=80',
+      'https://media.mojohomes.com.au/image/upload/c_limit,f_auto,w_2000/v1751000527/content-images/luxury-home-designs/luxury-home-designs-3.jpg',
       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80',
     ],
     map_link: '',
